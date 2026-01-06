@@ -54,4 +54,5 @@ streamlit run app.py
 MIT License
 
 <img width="1862" height="861" alt="app-main" src="https://github.com/user-attachments/assets/5bd4ad68-4be0-4c34-9108-fe4077884ebf" />
+<img width="1902" height="850" alt="app-report" src="https://github.com/user-attachments/assets/e59a7d67-e479-42a6-9f19-445417761a27" />
 
