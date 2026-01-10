@@ -1,0 +1,9 @@
+# Requirements for building the executable
+pyinstaller>=6.0.0
+
+# Include all runtime requirements
+anthropic>=0.39.0
+python-dotenv==1.0.0
+pydantic==2.10.4
+streamlit>=1.28.0
+slack-sdk>=3.23.0
