@@ -108,7 +108,7 @@ def main() -> int:
         # Initialize configuration
         config = Config()
         config.validate_slack()
-        config.validate_openai()
+        config.validate_anthropic()
 
         # Initialize clients
         client = WebClient(token=config.slack_bot_token)

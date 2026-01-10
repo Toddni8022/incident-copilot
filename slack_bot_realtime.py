@@ -46,8 +46,13 @@ class IncidentSlackBot:
         self.copilot = IncidentCopilot(config)
 
         # Get app token for Socket Mode
-        self.app_token = config.slack_bot_token.replace('xoxb', 'xapp')  # Placeholder
-        # You need to set SLACK_APP_TOKEN separately in .env
+        import os
+        self.app_token = os.getenv("SLACK_APP_TOKEN")
+        if not self.app_token:
+            raise ValueError(
+                "SLACK_APP_TOKEN environment variable is required for Socket Mode. "
+                "Get it from: https://api.slack.com/apps → Your App → Basic Information → App-Level Tokens"
+            )
 
         self.web_client = WebClient(token=config.slack_bot_token)
 
