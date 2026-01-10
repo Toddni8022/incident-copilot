@@ -5,7 +5,7 @@ AI-powered incident analysis tool that transforms messy IT incident tickets and 
 ## Features
 
 - **Slack Integration** - Monitor incident channels in real-time
-- **GPT-4 Analysis** - Intelligent parsing and categorization
+- **Claude AI Analysis** - Intelligent parsing and categorization using Claude 3.5 Sonnet
 - **Automated Reports** - Generate executive summaries, timelines, and action items
 - **Multi-format Support** - Handle tickets, chat logs, and unstructured data
 - **Web Interface** - User-friendly Streamlit dashboard
@@ -13,7 +13,7 @@ AI-powered incident analysis tool that transforms messy IT incident tickets and 
 ## Tech Stack
 
 - Python 3.11+
-- OpenAI GPT-4
+- Anthropic Claude 3.5 Sonnet
 - Slack SDK
 - Streamlit
 - Pydantic
@@ -38,10 +38,12 @@ pip install -r requirements.txt
 Create a .env file with your API keys:
 
 \\\
-OPENAI_API_KEY=your_openai_key
-SLACK_BOT_TOKEN=your_slack_token
-SLACK_APP_TOKEN=your_app_token
+ANTHROPIC_API_KEY=your_anthropic_key
+SLACK_BOT_TOKEN=your_slack_token  # Optional
+SLACK_APP_TOKEN=your_app_token    # Optional
 \\\
+
+Get your Anthropic API key from: https://console.anthropic.com/
 
 ## Usage
 

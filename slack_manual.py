@@ -4,7 +4,7 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from incident_parser import IncidentCopilot
 from typing import List, Dict
-from openai import APIError, APIConnectionError, RateLimitError
+from anthropic import APIError, APIConnectionError, RateLimitError
 from pydantic import ValidationError
 from config import Config, setup_logging, DEFAULT_MESSAGE_LIMIT
 
@@ -142,17 +142,17 @@ def main() -> int:
 
     except APIConnectionError as e:
         logger.error("API connection failed: %s", e)
-        print("\nError: Unable to connect to OpenAI API. Please check your internet connection.")
+        print("\nError: Unable to connect to Claude API. Please check your internet connection.")
         return 1
 
     except RateLimitError as e:
         logger.error("Rate limit exceeded: %s", e)
-        print("\nError: OpenAI rate limit exceeded. Please try again later.")
+        print("\nError: Claude API rate limit exceeded. Please try again later.")
         return 1
 
     except APIError as e:
-        logger.error("OpenAI API error: %s", e)
-        print(f"\nOpenAI API Error: {e}")
+        logger.error("Claude API error: %s", e)
+        print(f"\nClaude API Error: {e}")
         return 1
 
     except KeyboardInterrupt:

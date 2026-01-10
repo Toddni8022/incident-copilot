@@ -8,7 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, List, Dict
 import logging
-from openai import APIError, APIConnectionError, RateLimitError
+from anthropic import APIError, APIConnectionError, RateLimitError
 from pydantic import ValidationError
 from config import Config, setup_logging, TIMESTAMP_FORMAT, DEFAULT_MESSAGE_LIMIT
 
@@ -39,7 +39,7 @@ def get_copilot(config: Config) -> Optional[IncidentCopilot]:
     Returns:
         Optional[IncidentCopilot]: Copilot instance or None if API key not configured.
     """
-    if not config.has_openai():
+    if not config.has_anthropic():
         return None
 
     if "copilot" not in st.session_state:
@@ -162,13 +162,13 @@ def handle_error(error: Exception) -> None:
     if isinstance(error, ValueError):
         st.error(f"❌ Invalid input: {error}")
     elif isinstance(error, APIConnectionError):
-        st.error("❌ Unable to connect to OpenAI API. Please check your internet connection.")
+        st.error("❌ Unable to connect to Claude API. Please check your internet connection.")
     elif isinstance(error, RateLimitError):
-        st.error("❌ OpenAI rate limit exceeded. Please try again later.")
+        st.error("❌ Claude API rate limit exceeded. Please try again later.")
     elif isinstance(error, APIError):
-        st.error(f"❌ OpenAI API error: {error}")
+        st.error(f"❌ Claude API error: {error}")
     elif isinstance(error, ValidationError):
-        st.error("❌ Received invalid response from OpenAI. Please try again.")
+        st.error("❌ Received invalid response from Claude. Please try again.")
     elif isinstance(error, SlackApiError):
         st.error(f"❌ Slack API error: {error.response['error']}")
     else:
@@ -211,11 +211,11 @@ need to fix cron schedule and add monitoring""",
 
     if analyze_btn:
         if not copilot:
-            st.error("❌ OpenAI API key not configured. Please set OPENAI_API_KEY in your .env file.")
+            st.error("❌ Claude API key not configured. Please set ANTHROPIC_API_KEY in your .env file.")
         elif not incident_text or not incident_text.strip():
             st.warning("⚠️ Please enter incident notes to analyze.")
         else:
-            with st.spinner("🔄 Analyzing incident with AI..."):
+            with st.spinner("🔄 Analyzing incident with Claude AI..."):
                 try:
                     report = copilot.parse_incident(incident_text)
                     markdown = copilot.format_markdown(report)
@@ -246,7 +246,7 @@ with tab2:
 
     if fetch_btn:
         if not copilot:
-            st.error("❌ OpenAI API key not configured. Please set OPENAI_API_KEY in your .env file.")
+            st.error("❌ Claude API key not configured. Please set ANTHROPIC_API_KEY in your .env file.")
         elif not slack_client:
             st.error("❌ Slack not configured. Please set SLACK_BOT_TOKEN in your .env file.")
         elif not channel_id or not channel_id.strip():
@@ -350,10 +350,10 @@ with st.sidebar:
     st.markdown("**Status**")
 
     # Check API keys
-    if config.has_openai():
-        st.success("✅ OpenAI Connected")
+    if config.has_anthropic():
+        st.success("✅ Claude Connected")
     else:
-        st.error("❌ OpenAI Key Missing")
+        st.error("❌ Claude Key Missing")
 
     if config.has_slack():
         st.success("✅ Slack Connected")
@@ -362,5 +362,5 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("**About**")
-    st.markdown("AI-powered incident report generator using GPT-4")
+    st.markdown("AI-powered incident report generator using Claude")
     st.markdown("Transforms messy notes into structured documentation")

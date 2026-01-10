@@ -9,11 +9,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Constants
-DEFAULT_MODEL = "gpt-4o-2024-08-06"
+DEFAULT_MODEL = "claude-3-5-sonnet-20241022"
 OUTPUT_DIR = "output"
 DEFAULT_TEMPERATURE = 0.3
 DEFAULT_MESSAGE_LIMIT = 50
 TIMESTAMP_FORMAT = "%Y%m%d_%H%M%S"
+MAX_TOKENS = 4096
 
 # Logging configuration
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
@@ -25,24 +26,25 @@ class Config:
 
     def __init__(self):
         """Initialize configuration and validate required environment variables."""
-        self.openai_api_key: Optional[str] = os.getenv("OPENAI_API_KEY")
+        self.anthropic_api_key: Optional[str] = os.getenv("ANTHROPIC_API_KEY")
         self.slack_bot_token: Optional[str] = os.getenv("SLACK_BOT_TOKEN")
         self.model: str = os.getenv("MODEL", DEFAULT_MODEL)
         self.output_dir: str = os.getenv("OUTPUT_DIR", OUTPUT_DIR)
         self.temperature: float = float(os.getenv("TEMPERATURE", str(DEFAULT_TEMPERATURE)))
+        self.max_tokens: int = int(os.getenv("MAX_TOKENS", str(MAX_TOKENS)))
 
         # Ensure output directory exists
         os.makedirs(self.output_dir, exist_ok=True)
 
-    def validate_openai(self) -> None:
-        """Validate OpenAI API key is set.
+    def validate_anthropic(self) -> None:
+        """Validate Anthropic API key is set.
 
         Raises:
-            ValueError: If OPENAI_API_KEY is not set.
+            ValueError: If ANTHROPIC_API_KEY is not set.
         """
-        if not self.openai_api_key:
+        if not self.anthropic_api_key:
             raise ValueError(
-                "OPENAI_API_KEY environment variable is required. "
+                "ANTHROPIC_API_KEY environment variable is required. "
                 "Please set it in your .env file or environment."
             )
 
@@ -66,13 +68,13 @@ class Config:
         """
         return bool(self.slack_bot_token)
 
-    def has_openai(self) -> bool:
-        """Check if OpenAI configuration is available.
+    def has_anthropic(self) -> bool:
+        """Check if Anthropic API key is configured.
 
         Returns:
-            bool: True if OpenAI API key is configured.
+            bool: True if Anthropic API key is configured.
         """
-        return bool(self.openai_api_key)
+        return bool(self.anthropic_api_key)
 
 
 def setup_logging(name: str = __name__) -> logging.Logger:

@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 import logging
 from typing import Optional
-from openai import APIError, APIConnectionError, RateLimitError
+from anthropic import APIError, APIConnectionError, RateLimitError
 from pydantic import ValidationError
 from config import Config, setup_logging, TIMESTAMP_FORMAT
 
@@ -110,22 +110,22 @@ def main() -> int:
 
     except APIConnectionError as e:
         logger.error("API connection failed: %s", e)
-        print(f"Error: Unable to connect to OpenAI API. Please check your internet connection.")
+        print(f"Error: Unable to connect to Claude API. Please check your internet connection.")
         return 1
 
     except RateLimitError as e:
         logger.error("Rate limit exceeded: %s", e)
-        print(f"Error: OpenAI rate limit exceeded. Please try again later.")
+        print(f"Error: Claude API rate limit exceeded. Please try again later.")
         return 1
 
     except APIError as e:
-        logger.error("OpenAI API error: %s", e)
-        print(f"Error: OpenAI API error - {e}")
+        logger.error("Claude API error: %s", e)
+        print(f"Error: Claude API error - {e}")
         return 1
 
     except ValidationError as e:
         logger.error("Validation error: %s", e)
-        print(f"Error: Received invalid response from OpenAI. Please try again.")
+        print(f"Error: Received invalid response from Claude. Please try again.")
         return 1
 
     except OSError as e:

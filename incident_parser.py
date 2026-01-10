@@ -1,6 +1,7 @@
-"""Core incident parsing and report generation using OpenAI GPT-4."""
+"""Core incident parsing and report generation using Claude API."""
 
-from openai import OpenAI, APIError, APIConnectionError, RateLimitError
+import json
+from anthropic import Anthropic, APIError, APIConnectionError, RateLimitError
 from pydantic import BaseModel, ValidationError
 from typing import List, Optional
 import logging
@@ -69,7 +70,7 @@ class IncidentReport(BaseModel):
 
 
 class IncidentCopilot:
-    """AI-powered incident report generator using OpenAI GPT-4."""
+    """AI-powered incident report generator using Claude API."""
 
     def __init__(self, config: Optional[Config] = None):
         """Initialize the incident copilot.
@@ -78,17 +79,17 @@ class IncidentCopilot:
             config: Optional configuration object. If not provided, uses default Config.
 
         Raises:
-            ValueError: If OpenAI API key is not configured.
+            ValueError: If Anthropic API key is not configured.
         """
         self.config = config or Config()
-        self.config.validate_openai()
-        self.client = OpenAI(api_key=self.config.openai_api_key)
+        self.config.validate_anthropic()
+        self.client = Anthropic(api_key=self.config.anthropic_api_key)
         logger.info("IncidentCopilot initialized with model: %s", self.config.model)
 
     def parse_incident(
         self, raw_input: str, model: Optional[str] = None
     ) -> IncidentReport:
-        """Transform messy incident notes into structured report using GPT-4.
+        """Transform messy incident notes into structured report using Claude.
 
         Args:
             raw_input: Raw incident text (tickets, logs, chat messages, etc.).
@@ -99,9 +100,9 @@ class IncidentCopilot:
 
         Raises:
             ValueError: If raw_input is empty or whitespace-only.
-            APIConnectionError: If unable to connect to OpenAI API.
-            RateLimitError: If OpenAI rate limit is exceeded.
-            APIError: For other OpenAI API errors.
+            APIConnectionError: If unable to connect to Anthropic API.
+            RateLimitError: If Anthropic rate limit is exceeded.
+            APIError: For other Anthropic API errors.
             ValidationError: If the API response doesn't match expected schema.
         """
         # Input validation
@@ -120,41 +121,82 @@ Extract and organize:
 - Impact assessment (users affected, downtime duration, business impact)
 - Actionable next steps with priorities
 
-Be concise but thorough. If information is missing, indicate it clearly rather than fabricating details."""
+Be concise but thorough. If information is missing, indicate it clearly rather than fabricating details.
+
+You MUST respond with valid JSON in this exact format:
+{
+  "incident_id": "string or null",
+  "title": "string",
+  "executive_summary": "string",
+  "affected_systems": ["string"],
+  "timeline": [
+    {
+      "timestamp": "string",
+      "event_description": "string",
+      "severity": "string or null"
+    }
+  ],
+  "root_cause_hypothesis": "string",
+  "impact_assessment": "string",
+  "resolution_summary": "string",
+  "action_items": [
+    {
+      "task": "string",
+      "priority": "string",
+      "assigned_to": "string or null",
+      "estimated_completion": "string or null"
+    }
+  ],
+  "related_incidents": ["string"] or null
+}
+
+Only return the JSON object, nothing else."""
+
+        user_prompt = f"Analyze this incident and return a JSON report:\n\n{raw_input}"
 
         try:
-            response = self.client.beta.chat.completions.parse(
+            response = self.client.messages.create(
                 model=model_name,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"Analyze this incident:\n\n{raw_input}"},
-                ],
-                response_format=IncidentReport,
+                max_tokens=self.config.max_tokens,
                 temperature=self.config.temperature,
+                system=system_prompt,
+                messages=[
+                    {"role": "user", "content": user_prompt}
+                ],
             )
 
-            parsed_report = response.choices[0].message.parsed
-            logger.info("Successfully parsed incident: %s", parsed_report.title)
-            return parsed_report
+            # Extract text content from response
+            response_text = response.content[0].text
+
+            # Parse JSON response
+            try:
+                json_data = json.loads(response_text)
+                parsed_report = IncidentReport(**json_data)
+                logger.info("Successfully parsed incident: %s", parsed_report.title)
+                return parsed_report
+            except json.JSONDecodeError as e:
+                logger.error("Failed to parse JSON from Claude response: %s", e)
+                logger.debug("Response text: %s", response_text)
+                raise ValidationError(
+                    f"Claude returned invalid JSON. Please try again."
+                ) from e
 
         except APIConnectionError as e:
-            logger.error("Failed to connect to OpenAI API: %s", e)
+            logger.error("Failed to connect to Anthropic API: %s", e)
             raise APIConnectionError(
-                "Unable to connect to OpenAI API. Please check your internet connection."
+                "Unable to connect to Anthropic API. Please check your internet connection."
             ) from e
         except RateLimitError as e:
-            logger.error("OpenAI rate limit exceeded: %s", e)
+            logger.error("Anthropic rate limit exceeded: %s", e)
             raise RateLimitError(
-                "OpenAI rate limit exceeded. Please try again later."
+                "Anthropic rate limit exceeded. Please try again later."
             ) from e
         except APIError as e:
-            logger.error("OpenAI API error: %s", e)
+            logger.error("Anthropic API error: %s", e)
             raise
         except ValidationError as e:
             logger.error("Failed to validate API response: %s", e)
-            raise ValidationError(
-                "Received invalid response from OpenAI API. Please try again."
-            ) from e
+            raise
 
     def format_markdown(self, report: IncidentReport) -> str:
         """Convert structured report to readable markdown format.
