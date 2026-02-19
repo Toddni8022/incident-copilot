@@ -1,58 +1,63 @@
-﻿# 🚨 IT Incident Copilot
+# Incident Copilot
 
-AI-powered incident analysis tool that transforms messy IT incident tickets and Slack conversations into professional incident reports.
+An AI-powered IT incident analysis tool that transforms messy incident tickets and raw Slack conversations into clean, professional incident reports. Built for SOC teams, IT ops, and incident responders who need fast, structured analysis without the manual work.
+
+---
+
+## What It Does
+
+- **Monitors Slack** in real time for incident-related conversations
+- **Parses incident tickets** and unstructured log data
+- **Uses GPT-4** to categorize, analyze, and summarize incidents
+- **Generates professional reports** with executive summaries, timelines, and action items
+- **Streamlit dashboard** for viewing and managing incident history
+
+---
 
 ## Features
 
-- **Slack Integration** - Monitor incident channels in real-time
-- **GPT-4 Analysis** - Intelligent parsing and categorization
-- **Automated Reports** - Generate executive summaries, timelines, and action items
-- **Multi-format Support** - Handle tickets, chat logs, and unstructured data
-- **Web Interface** - User-friendly Streamlit dashboard
+- Real-time Slack channel monitoring via Slack SDK
+- AI-driven incident categorization and severity scoring
+- Automated executive summaries
+- Timeline reconstruction from fragmented messages
+- Action item extraction
+- Web dashboard for report management
+
+---
 
 ## Tech Stack
 
-- Python 3.11+
-- OpenAI GPT-4
-- Slack SDK
-- Streamlit
-- Pydantic
+- **Python 3.11+**
+- **OpenAI GPT-4** — Incident analysis and report generation
+- **Slack SDK** — Real-time channel monitoring
+- **Streamlit** — Web dashboard
+- **Pydantic** — Data validation and modeling
 
-## Installation
+---
 
-\\\ash
-# Clone repository
-git clone https://github.com/Toddni8022/incident-copilot.git
-cd incident-copilot
+## Setup
 
-# Create virtual environment
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-
-# Install dependencies
+1. Clone the repo
+2. Install dependencies:
+```bash
 pip install -r requirements.txt
-\\\
-
-## Configuration
-
-Create a .env file with your API keys:
-
-\\\
-OPENAI_API_KEY=your_openai_key
-SLACK_BOT_TOKEN=your_slack_token
+```
+3. Create a `.env` file with your credentials:
+```
+OPENAI_API_KEY=your_key_here
+SLACK_BOT_TOKEN=your_bot_token
 SLACK_APP_TOKEN=your_app_token
-\\\
-
-## Usage
-
-\\\ash
+```
+4. Run the app:
+```bash
 streamlit run app.py
-\\\
+```
 
-## License
+---
 
-MIT License
+## Use Cases
 
-<img width="1862" height="861" alt="app-main" src="https://github.com/user-attachments/assets/5bd4ad68-4be0-4c34-9108-fe4077884ebf" />
-<img width="1902" height="850" alt="app-report" src="https://github.com/user-attachments/assets/e59a7d67-e479-42a6-9f19-445417761a27" />
-
+- SOC teams needing fast incident summaries from Slack war rooms
+- IT operations automating post-incident reports
+- Incident commanders who need timelines without digging through chat logs
+- Anyone turning noisy alert channels into structured reports
