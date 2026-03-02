@@ -1,0 +1,8 @@
+﻿prod db slow, users reporting 500 errors on checkout page starting around 2:45pm
+checked logs - connection pool maxed out
+dave restarted db instance at 3:10
+errors stopped at 3:15 
+looks like the marketing batch job ran during business hours instead of overnight
+need to fix cron schedule and add connection pool monitoring
+also maybe increase pool size from 50 to 100
+ticket #INC-8472

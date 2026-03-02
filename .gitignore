@@ -1,17 +1,56 @@
 ﻿# Environment variables (DO NOT commit API keys!)
 .env
+.env.local
 
 # Python
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 *.class
 *.so
 .Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+wheels/
+.installed.cfg
+lib/
+lib64/
+MANIFEST
+
+# Virtual environments
+.venv/
 venv/
 env/
 ENV/
+env.bak/
+venv.bak/
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
 
 # Output files
+output/
 output/*.md
 
 # IDE
@@ -19,6 +58,7 @@ output/*.md
 .idea/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
@@ -26,3 +66,6 @@ Thumbs.db
 
 # Streamlit
 .streamlit/
+
+# Docker
+

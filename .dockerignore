@@ -1,0 +1,35 @@
+# Git
+.git
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Environment files
+.env
+.env.local
+
+# Application output
+output/
+
+# OS
+.DS_Store
+Thumbs.db
