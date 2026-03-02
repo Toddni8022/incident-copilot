@@ -1,0 +1,9 @@
+[run]
+source = incident_copilot
+omit =
+    tests/*
+    setup.py
+
+[report]
+show_missing = True
+skip_covered = False
