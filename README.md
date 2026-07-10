@@ -1,68 +1,91 @@
 # Incident Copilot
 
-AI-powered incident analysis tool that converts unstructured Slack incident conversations into structured incident reports.
+An AI-assisted incident reporting application that turns messy ticket notes or Slack incident conversations into validated, structured post-incident reports.
 
-This project demonstrates how large language models can assist engineering and IT teams during incident response by extracting timelines, root causes, and action items from chat discussions.
+![Application report view](images/app-report.png)
 
----
+## What it produces
 
-## Overview
+- Executive summary and affected systems
+- Timestamped incident timeline
+- Root-cause hypothesis clearly separated from confirmed facts
+- Impact and resolution summaries
+- Prioritized action items with owners and estimates when available
+- Missing-information checklist to prevent confident guesses
+- Downloadable Markdown reports
 
-During production incidents, teams often coordinate in Slack channels. Important information becomes scattered across dozens or hundreds of messages.
+## Interfaces
 
-Incident Copilot analyzes these conversations and automatically generates structured incident reports including:
-
-- Timeline of key events
-- Incident summary
-- Suspected root cause
-- Impact analysis
-- Recommended follow-up actions
-
-This helps teams reduce the time required to produce post-incident reports and improves incident documentation.
-
----
-
-## Features
-
-- Parse Slack conversation logs
-- Extract key events and timestamps
-- Generate incident summaries using LLMs
-- Identify potential root causes
-- Output structured reports
-- Export reports in Markdown or JSON format
-
----
+| Interface | Best for |
+| --- | --- |
+| Streamlit | Pasting notes, importing a Slack channel, and reviewing reports visually |
+| CLI | Local files, automation, and repeatable demonstrations |
 
 ## Architecture
 
-Slack Logs  
-↓  
-Preprocessing Pipeline  
-↓  
-LLM Analysis  
-↓  
-Incident Report Generator  
+```mermaid
+flowchart LR
+    A[Notes or Slack] --> B[Input normalization]
+    B --> C[OpenAI structured output]
+    C --> D[Pydantic validation]
+    D --> E[Markdown report]
+```
 
-The system processes conversation logs, extracts relevant context, and uses an LLM to generate a structured incident report.
+The model does not directly write the final document. Its response must first pass the `IncidentReport` Pydantic schema, which constrains priorities, timeline severity values, and required sections.
 
----
+## Quick start
 
-## Tech Stack
+```bash
+git clone https://github.com/Toddni8022/incident-copilot.git
+cd incident-copilot
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env
+streamlit run app.py
+```
 
-- Python
-- Pandas
-- OpenAI / LLM API
-- JSON processing
-- CLI interface
+For the command line:
 
----
+```bash
+python main.py examples/sample_ticket.txt
+```
 
-## Example Workflow
+Reports are written to `output/` by default.
 
-1. Export Slack incident channel messages
-2. Save conversation logs as JSON
-3. Run the analysis pipeline
-4. Generate a structured incident report
+## Configuration
 
-Example command:
+| Variable | Required | Description |
+| --- | --- | --- |
+| `OPENAI_API_KEY` | Yes | OpenAI API key |
+| `MODEL` | No | Structured-output compatible model |
+| `SLACK_BOT_TOKEN` | Only for Slack | Bot token with permission to read the selected channel |
+| `OUTPUT_DIR` | No | Report directory; defaults to `output` |
+| `TEMPERATURE` | No | Sampling temperature; defaults to `0.3` |
+| `LOG_LEVEL` | No | Python logging level |
 
+The Slack bot must be explicitly invited to a channel. Use the minimum scopes required for your workspace, and never commit tokens.
+
+## Test and quality checks
+
+```bash
+pip install -r requirements-dev.txt
+pytest -q
+```
+
+GitHub Actions runs compilation and unit tests on every push and pull request. Tests do not call OpenAI or Slack.
+
+## Responsible use
+
+- Treat root cause as a hypothesis until evidence confirms it.
+- Review generated reports before they enter an ITSM or compliance system.
+- Redact credentials, personal data, and other sensitive content before using external APIs.
+- Slack import is opt-in and limited to the channel and message count selected by the operator.
+
+## Limitations
+
+This is a portfolio-scale application, not a replacement for PagerDuty, ServiceNow, or an enterprise evidence store. It does not currently resolve Slack user IDs to names, ingest message threads, or calculate incident metrics from monitoring systems.
+
+## License
+
+MIT
